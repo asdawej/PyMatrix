@@ -27,6 +27,17 @@ def zeros(*args: int) -> Matrix:
         return Matrix(temp)
 
 
+def iszeros(mat: Matrix) -> bool:
+    '''
+    To check whether it is a zeros Matrix
+    '''
+    for i in range(1, mat.shape.m+1):
+        for j in range(1, mat.shape.n+1):
+            if mat[i, j] != 0:
+                return False
+    return True
+
+
 def ones(*args: int) -> Matrix:
     '''
     Create a Matrix with 1\n
@@ -44,6 +55,17 @@ def ones(*args: int) -> Matrix:
         temp = zeros(args[0], args[1])
     temp[...] = 1
     return temp
+
+
+def isones(mat: Matrix) -> bool:
+    '''
+    To check whether it is a ones Matrix
+    '''
+    for i in range(1, mat.shape.m+1):
+        for j in range(1, mat.shape.n+1):
+            if mat[i, j] != 1:
+                return False
+    return True
 
 
 def nones(*args: int) -> Matrix:
@@ -65,6 +87,17 @@ def nones(*args: int) -> Matrix:
     return temp
 
 
+def isnones(mat: Matrix) -> bool:
+    '''
+    To check whether it is a nones Matrix
+    '''
+    for i in range(1, mat.shape.m+1):
+        for j in range(1, mat.shape.n+1):
+            if mat[i, j] != None:
+                return False
+    return True
+
+
 def eye(*args: int) -> Matrix:
     '''
     Create a Matrix with only the diagnal being 1\n
@@ -83,6 +116,21 @@ def eye(*args: int) -> Matrix:
     for i in range(1, min(temp.shape.m, temp.shape.n)+1):
         temp[i, i] = 1
     return temp
+
+
+def iseye(mat: Matrix) -> bool:
+    '''
+    To check whether it is a eye Matrix
+    '''
+    for i in range(1, mat.shape.m+1):
+        for j in range(1, mat.shape.n+1):
+            if i == j:
+                if mat[i, j] != 1:
+                    return False
+            else:
+                if mat[i, j] != 0:
+                    return False
+    return True
 
 
 class Element_Matrix_Arg(object):
@@ -135,12 +183,20 @@ def gauss(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Elem
     '''
     Gauss Simplification, or the partial rref\n
     ---
-    gauss()
+    gauss(
+        [[1, 1, 3],\n
+        [2, 2, 4]]
+    ) ->\n
+    [[1, 1, 3],\n
+    [0, 0, 1]]\n
+    record =
+        E(1, 2; -2)\n
+        E(2; -1/2)
     '''
     pass
 
 
-def ifgauss(mat: Matrix) -> bool:
+def isgauss(mat: Matrix) -> bool:
     '''
     To check whether the Matrix is Gauss-Simplified
     '''
@@ -151,7 +207,14 @@ def jordan(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Ele
     '''
     Add to Gauss Simplification, the second part of Gauss-Jordan Simplification, or rref\n
     ---
-    jordan()
+    jordan(
+        [[1, 1, 3],\n
+        [0, 0, 1]]
+    ) ->\n
+    [[1, 1, 0],\n
+    [0, 0, 1]]\n
+    record =
+        E(2, 1; -3)
     '''
     pass
 
@@ -160,12 +223,21 @@ def rref(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Eleme
     '''
     Gauss-Jordan Simplification\n
     ---
-    rref()
+    rref(
+        [[1, 1, 3],\n
+        [2, 2, 4]]
+    ) ->\n
+    [[1, 1, 0],\n
+    [0, 0, 1]]\n
+    record =
+        E(1, 2; -2)\n
+        E(2; -1/2)\n
+        E(2, 1; -3)
     '''
     pass
 
 
-def ifrref(mat: Matrix) -> bool:
+def isrref(mat: Matrix) -> bool:
     '''
     To check whether the Matrix is rrefed
     '''
@@ -177,6 +249,7 @@ if __name__ == '__main__':
     print(zeros(3), '\n')
     print(ones(2, 3), '\n')
     print(eye(3), '\n')
+    print(iszeros(zeros(4, 5)), iseye(eye(7, 2)), '\n')
 
     print('Element_Matrix test:')
     print(Element_Matrix(4, 1, 4), '\n')
