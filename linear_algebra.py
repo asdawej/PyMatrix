@@ -179,19 +179,67 @@ class Element_Matrix(Matrix):
         self.arg = Element_Matrix_Arg(i, j, k)
 
 
+def row_Ele_Trans(mat: Matrix, i, j: int = None, *, k: int = None, record: bool = False) -> NoReturn | Matrix:
+    '''
+    Row Elementary Transformation\n
+    For i, j, k, please search Elementary_Matrix() for more information
+    '''
+    if j:
+        if k:
+            for t in range(1, mat.shape.n+1):
+                mat[j, t] += (mat[i, t]*k)
+        else:
+            for t in range(1, mat.shape.n+1):
+                mat[i, t], mat[j, t] = mat[j, t], mat[i, t]
+    elif k:
+        for t in range(1, mat.shape.n+1):
+            mat[i, t] *= k
+    else:
+        raise TypeError('Arguments missing for j or k')
+    if record:
+        return mat
+
+
+R_ET = row_Ele_Trans
+
+
+def column_Ele_Trans(mat: Matrix, i, j: int = None, *, k: int = None, record: bool = False) -> NoReturn | Matrix:
+    '''
+    Column Elementary Transformation\n
+    For i, j, k, please search Elementary_Matrix() for more information
+    '''
+    if j:
+        if k:
+            for t in range(1, mat.shape.m+1):
+                mat[t, j] += (mat[t, i]*k)
+        else:
+            for t in range(1, mat.shape.m+1):
+                mat[t, i], mat[t, j] = mat[t, j], mat[t, i]
+    elif k:
+        for t in range(1, mat.shape.m+1):
+            mat[t, i] *= k
+    else:
+        raise TypeError('Arguments missing for j or k')
+    if record:
+        return mat
+
+
+C_ET = column_Ele_Trans
+
+
 def gauss(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
     '''
     Gauss Simplification, or the partial rref\n
+    CHANGE and OUTPUT your Matrix\n
     ---
     gauss(
         [[1, 1, 3],\n
         [2, 2, 4]]
     ) ->\n
     [[1, 1, 3],\n
-    [0, 0, 1]]\n
+    [0, 0, -2]]\n
     record =
-        E(1, 2; -2)\n
-        E(2; -1/2)
+        E(1, 2; -2)
     '''
     pass
 
@@ -206,14 +254,16 @@ def isgauss(mat: Matrix) -> bool:
 def jordan(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
     '''
     Add to Gauss Simplification, the second part of Gauss-Jordan Simplification, or rref\n
+    CHANGE and OUTPUT your Matrix\n
     ---
     jordan(
         [[1, 1, 3],\n
-        [0, 0, 1]]
+        [0, 0, -2]]
     ) ->\n
     [[1, 1, 0],\n
     [0, 0, 1]]\n
     record =
+        E(2; -1/2)\n
         E(2, 1; -3)
     '''
     pass
@@ -222,6 +272,7 @@ def jordan(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Ele
 def rref(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
     '''
     Gauss-Jordan Simplification\n
+    CHANGE and OUTPUT your Matrix\n
     ---
     rref(
         [[1, 1, 3],\n
@@ -255,3 +306,11 @@ if __name__ == '__main__':
     print(Element_Matrix(4, 1, 4), '\n')
     print(Element_Matrix(4, 1, k=5), '\n')
     print(Element_Matrix(4, 1, 3, k=5), '\n')
+
+    print('Elementary Transformation test:')
+    a = Matrix([[1, 2, 3], [4, 5, 6]])
+    C_ET(a, 1, 2)
+    print(a, '\n')
+    C_ET(a, 2, k=3)
+    print(a, '\n')
+    print(C_ET(a, 1, 2, k=-1, record=True))
