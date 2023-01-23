@@ -151,7 +151,7 @@ class Element_Matrix(Matrix):
     Methods are /T/, /enblock/, /unblock/
     '''
 
-    def __init__(self, n: int, i: int, j: int = None, *, k: int = None) -> NoReturn:
+    def __init__(self, n: int, i: int, j: int = None, *, k: Any = None) -> NoReturn:
         '''
         To create an Elementary Matrix, you should give n, i,
         and must give j or k at least one arg\n
@@ -179,7 +179,11 @@ class Element_Matrix(Matrix):
         self.arg = Element_Matrix_Arg(i, j, k)
 
 
-def row_Ele_Trans(mat: Matrix, i, j: int = None, *, k: int = None, record: bool = False) -> NoReturn | Matrix:
+def row_Ele_Trans(
+    mat: Matrix,
+    i: int, j: int = None, *, k: Any = None,
+    record: bool = False
+) -> NoReturn | Element_Matrix:
     '''
     Row Elementary Transformation\n
     For i, j, k, please search Elementary_Matrix() for more information
@@ -197,13 +201,17 @@ def row_Ele_Trans(mat: Matrix, i, j: int = None, *, k: int = None, record: bool 
     else:
         raise TypeError('Arguments missing for j or k')
     if record:
-        return mat
+        return Element_Matrix(mat.shape.m, i, j, k=k)
 
 
 R_ET = row_Ele_Trans
 
 
-def column_Ele_Trans(mat: Matrix, i, j: int = None, *, k: int = None, record: bool = False) -> NoReturn | Matrix:
+def column_Ele_Trans(
+    mat: Matrix,
+    i: int, j: int = None, *, k: Any = None,
+    record: bool = False
+) -> NoReturn | Element_Matrix:
     '''
     Column Elementary Transformation\n
     For i, j, k, please search Elementary_Matrix() for more information
@@ -221,15 +229,22 @@ def column_Ele_Trans(mat: Matrix, i, j: int = None, *, k: int = None, record: bo
     else:
         raise TypeError('Arguments missing for j or k')
     if record:
-        return mat
+        return Element_Matrix(mat.shape.n, i, j, k=k)
 
 
 C_ET = column_Ele_Trans
 
 
-def gauss(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
+def gauss(
+    mat: Matrix,
+    record: bool = False,
+    preoptimize: bool = True
+) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
     '''
     Gauss Simplification, or the partial rref\n
+    Pre-optimization is a permutation that\
+    put all the maximums of columns on the diagonal\
+    to try to simplify calculation\n
     CHANGE and OUTPUT your Matrix\n
     ---
     gauss(
@@ -248,10 +263,26 @@ def isgauss(mat: Matrix) -> bool:
     '''
     To check whether the Matrix is Gauss-Simplified
     '''
-    pass
+    row_pivots: list[int] = []
+    for j in range(1, mat.shape.n+1):
+        save = 0
+        for i in range(1, mat.shape.m+1):
+            if mat[i, j] != 0:
+                save = i
+        if not save in row_pivots and save != 0:
+            row_pivots.append(save)
+    t = 1
+    for x in row_pivots:
+        if x != t:
+            return False
+        t += 1
+    return True
 
 
-def jordan(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
+def jordan(
+    mat: Matrix,
+    record: bool = False
+) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
     '''
     Add to Gauss Simplification, the second part of Gauss-Jordan Simplification, or rref\n
     CHANGE and OUTPUT your Matrix\n
@@ -269,9 +300,13 @@ def jordan(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Ele
     pass
 
 
-def rref(mat: Matrix, record: bool = False) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
+def rref(
+    mat: Matrix,
+    record: bool = False
+) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
     '''
-    Gauss-Jordan Simplification\n
+    To get reduced the row echelon form of a Matrix\
+    by Gauss-Jordan Simplification\n
     CHANGE and OUTPUT your Matrix\n
     ---
     rref(
@@ -292,7 +327,25 @@ def isrref(mat: Matrix) -> bool:
     '''
     To check whether the Matrix is rrefed
     '''
-    pass
+    row_pivots: list[int] = []
+    for j in range(1, mat.shape.n+1):
+        save = 0
+        zero_count = 0
+        for i in range(1, mat.shape.m+1):
+            if mat[i, j] != 0:
+                save = i
+            else:
+                zero_count += 1
+        if not save in row_pivots and save != 0:
+            if zero_count+1 != mat.shape.m:
+                return False
+            row_pivots.append(save)
+    t = 1
+    for x in row_pivots:
+        if x != t:
+            return False
+        t += 1
+    return True
 
 
 if __name__ == '__main__':
@@ -313,4 +366,10 @@ if __name__ == '__main__':
     print(a, '\n')
     C_ET(a, 2, k=3)
     print(a, '\n')
-    print(C_ET(a, 1, 2, k=-1, record=True))
+    print(C_ET(a, 1, 2, k=-1, record=True), '\n')
+
+    print('isgauss & isrref test:')
+    print(isgauss(Matrix([[1, 2, 0], [0, 3, 4]])))
+    print(isgauss(Matrix([[0, 1, 0], [0, 2, 0], [0, 0, 0]])))
+    print(isrref(Matrix([[1, 2, 0], [0, 0, 0]])))
+    print(isrref(Matrix([[1, 2, 0], [0, 3, 4]])))

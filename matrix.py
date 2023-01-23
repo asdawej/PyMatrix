@@ -418,7 +418,11 @@ class Matrix(object):
         '''
         return self.shape.m*self.shape.n
 
-    def __call__(self, *args: 'Matrix', kw: bool = False, **kwds: 'Matrix') -> 'Matrix' | Dict[str, 'Matrix']:
+    def __call__(
+        self, *args: 'Matrix',
+        kw: bool = False,
+        **kwds: 'Matrix'
+    ) -> 'Matrix' | Dict[str, 'Matrix']:
         '''
         If kw is False, return self@args\n
         If, kw is True, return a dict of self@kwds[x] for x in kwds
