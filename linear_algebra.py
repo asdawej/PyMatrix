@@ -374,15 +374,74 @@ def jordan(
     [[1, 1, 0],\n
     [0, 0, 1]]\n
     record =
-        E(2; -1/2)\n
-        E(2, 1; -3)
+        E(2, 1; 3/2)\n
+        E(2; -1/2)
     '''
     if not isgauss(mat):
         raise ValueError('Not row echelon form')
     if record:
-        pass
+        path: list[Element_Matrix] = []
+        column_pivots: list[int] = []
+        save = 1
+        # Find all the pivots
+        for j in range(1, mat.shape.n+1):
+            if mat[save, j] != 0:
+                column_pivots.append(j)
+                save += 1
+        save -= 1
+        # Mul-add elimination
+        for x in reversed(column_pivots):
+            for i in range(save-1, 0, -1):
+                if mat[i, x] != 0:
+                    path.append(
+                        R_ET(
+                            mat, save, i,
+                            k=-mat[i, x]/mat[save, x],
+                            record=True
+                        )
+                    )
+            save -= 1
+        save += 1
+        # Convert pivots into ones
+        for x in column_pivots:
+            if mat[save, x] != 1:
+                path.append(
+                    R_ET(
+                        mat, save,
+                        k=1/mat[save, x],
+                        record=True
+                    )
+                )
+            save += 1
+        return mat, path
     else:
-        pass
+        column_pivots: list[int] = []
+        save = 1
+        # Find all the pivots
+        for j in range(1, mat.shape.n+1):
+            if mat[save, j] != 0:
+                column_pivots.append(j)
+                save += 1
+        save -= 1
+        # Mul-add elimination
+        for x in reversed(column_pivots):
+            for i in range(save-1, 0, -1):
+                if mat[i, x] != 0:
+                    R_ET(
+                        mat, save, i,
+                        k=-mat[i, x]/mat[save, x]
+                    )
+            save -= 1
+        save += 1
+        # Convert pivots into ones
+        for x in column_pivots:
+            if mat[save, x] != 1:
+                R_ET(
+                    mat, save,
+                    k=1/mat[save, x]
+                )
+            save += 1
+        return mat
 
 
 def rref(
@@ -403,13 +462,22 @@ def rref(
     [0, 0, 1]]\n
     record =
         E(1, 2; -2)\n
-        E(2; -1/2)\n
-        E(2, 1; -3)
+        E(2, 1; 3/2)\n
+        E(2; -1/2)
+    ->\n
+    {preoptimize = True}\n
+    [[1, 1, 0],\n
+    [0, 0, 1]]\n
+    record =
+        E(1, 2)\n
+        E(1, 2; -1/2)\n
+        E(2, 1; -4)\n
+        E(1; 1/2)
     '''
     if record:
         temp, path1 = gauss(mat, True, preoptimize)
         ret, path2 = jordan(temp, True)
-        return (ret, path1+path2)
+        return ret, path1+path2
     else:
         return jordan(gauss(mat, preoptimize=preoptimize))
 
@@ -472,6 +540,17 @@ if __name__ == '__main__':
     for i, x in enumerate(path):
         print(i, x, '\n')
     c, path = gauss(b, True, False)
+    print(b, '\n')
+    for i, x in enumerate(path):
+        print(i, x, '\n')
+
+    print('jordan & rref test:')
+    b = Matrix([[1, 1, 3], [2, 2, 4]])
+    c, path = rref(b[...], True)
+    print(c, '\n')
+    for i, x in enumerate(path):
+        print(i, x, '\n')
+    c, path = rref(b, True, False)
     print(b, '\n')
     for i, x in enumerate(path):
         print(i, x, '\n')
