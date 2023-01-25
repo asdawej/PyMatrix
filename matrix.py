@@ -395,6 +395,17 @@ class Matrix(object):
                 temp[-1].append(f(i+1, j+1))
         return Matrix(temp)
 
+    def __pow__(self, other: int) -> 'Matrix':
+        '''
+        Integer power of square Matrix
+        '''
+        if self.shape.m != self.shape.n:
+            raise ShapeError('Not a square Matrix')
+        temp = self
+        for _ in range(other-1):
+            temp = temp@self
+        return temp
+
     def __str__(self) -> str:
         '''
         To print the Matrix
@@ -622,6 +633,8 @@ if __name__ == '__main__':
     print(4*f, '\n')
     print('__matmul__ test:')
     print(d@e, '\n')
+    print('__pow__ test:')
+    print(Matrix([[1, 1, 0], [0, 1, 1], [0, 0, 1]])**4, '\n')
 
     va = Matrix([[1], [0], [5]])
     vb = Matrix([[3], [1], [2]])
