@@ -15,7 +15,7 @@ class Shape(object):
         return self.m == other.m and self.n == other.n
 
 
-class ShapeError(Exception):
+class ShapeError(ValueError):
     pass
 
 

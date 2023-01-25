@@ -255,8 +255,88 @@ def gauss(
     [0, 0, -2]]\n
     record =
         E(1, 2; -2)
+    ->\n
+    {preoptimize = True}\n
+    [[2, 2, 4],\n
+    [0, 0, 1]]\n
+    record =
+        E(1, 1)\n
+        E(1, 2; -1/2)
     '''
-    pass
+    if record:
+        path: list[Element_Matrix] = []
+        if preoptimize:
+            # Pre-optimization
+            for i in range(1, min(mat.shape.m, mat.shape.n)+1):
+                max_row_save = i
+                for t in range(i+1, mat.shape.m+1):
+                    if mat[t, i] > mat[max_row_save, i]:
+                        max_row_save = t
+                if max_row_save != i:
+                    path.append(R_ET(mat, i, max_row_save, record=True))
+        row_ptr, column_ptr = 1, 1
+        while column_ptr <= mat.shape.n:
+            # Expected pivot is zero
+            if mat[row_ptr, column_ptr] == 0:
+                flag = True
+                for t in range(row_ptr+1, mat.shape.m+1):
+                    # Find a non-zero element, swap the two rows
+                    if mat[t, column_ptr] != 0:
+                        flag = False
+                        path.append(R_ET(mat, row_ptr, t, record=True))
+                        break
+                # Can not find a non-zero element, move right
+                if flag:
+                    column_ptr += 1
+                    continue
+            # Mul-add elimination
+            for t in range(row_ptr+1, mat.shape.m+1):
+                if mat[t, column_ptr] != 0:
+                    path.append(
+                        R_ET(
+                            mat, row_ptr, t,
+                            k=-mat[t, column_ptr]/mat[row_ptr, column_ptr],
+                            record=True
+                        )
+                    )
+            row_ptr += 1
+            column_ptr += 1
+        return mat, path
+    else:
+        if preoptimize:
+            # Pre-optimization
+            for i in range(1, min(mat.shape.m, mat.shape.n)+1):
+                max_row_save = i
+                for t in range(i+1, mat.shape.m+1):
+                    if mat[t, i] > mat[max_row_save, i]:
+                        max_row_save = t
+                if max_row_save != i:
+                    R_ET(mat, i, max_row_save)
+        row_ptr, column_ptr = 1, 1
+        while column_ptr <= mat.shape.n:
+            # Expected pivot is zero
+            if mat[row_ptr, column_ptr] == 0:
+                flag = True
+                for t in range(row_ptr+1, mat.shape.m+1):
+                    # Find a non-zero element, swap the two rows
+                    if mat[t, column_ptr] != 0:
+                        flag = False
+                        R_ET(mat, row_ptr, t)
+                        break
+                # Can not find a non-zero element, move right
+                if flag:
+                    column_ptr += 1
+                    continue
+            # Mul-add elimination
+            for t in range(row_ptr+1, mat.shape.m+1):
+                if mat[t, column_ptr] != 0:
+                    R_ET(
+                        mat, row_ptr, t,
+                        k=-mat[t, column_ptr]/mat[row_ptr, column_ptr]
+                    )
+            row_ptr += 1
+            column_ptr += 1
+        return mat
 
 
 def isgauss(mat: Matrix) -> bool:
@@ -297,15 +377,21 @@ def jordan(
         E(2; -1/2)\n
         E(2, 1; -3)
     '''
-    pass
+    if not isgauss(mat):
+        raise ValueError('Not row echelon form')
+    if record:
+        pass
+    else:
+        pass
 
 
 def rref(
     mat: Matrix,
-    record: bool = False
+    record: bool = False,
+    preoptimize: bool = True
 ) -> Matrix | tuple[Matrix, list[Element_Matrix]]:
     '''
-    To get reduced the row echelon form of a Matrix\
+    To get the reduced row echelon form of a Matrix\
     by Gauss-Jordan Simplification\n
     CHANGE and OUTPUT your Matrix\n
     ---
@@ -320,7 +406,12 @@ def rref(
         E(2; -1/2)\n
         E(2, 1; -3)
     '''
-    pass
+    if record:
+        temp, path1 = gauss(mat, True, preoptimize)
+        ret, path2 = jordan(temp, True)
+        return (ret, path1+path2)
+    else:
+        return jordan(gauss(mat, preoptimize=preoptimize))
 
 
 def isrref(mat: Matrix) -> bool:
@@ -373,3 +464,14 @@ if __name__ == '__main__':
     print(isgauss(Matrix([[0, 1, 0], [0, 2, 0], [0, 0, 0]])))
     print(isrref(Matrix([[1, 2, 0], [0, 0, 0]])))
     print(isrref(Matrix([[1, 2, 0], [0, 3, 4]])))
+
+    print('gauss test:')
+    b = Matrix([[1, 1, 3], [2, 2, 4]])
+    c, path = gauss(b[...], True)
+    print(c, '\n')
+    for i, x in enumerate(path):
+        print(i, x, '\n')
+    c, path = gauss(b, True, False)
+    print(b, '\n')
+    for i, x in enumerate(path):
+        print(i, x, '\n')
