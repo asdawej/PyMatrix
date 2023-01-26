@@ -1,6 +1,9 @@
 from matrix import *
 
 
+# << Common used Matrix >>
+
+
 def zeros(*args: int) -> Matrix:
     '''
     Create a Matrix with 0\n
@@ -133,6 +136,9 @@ def iseye(mat: Matrix) -> bool:
     return True
 
 
+# << Elementary Matrix and transformation >>
+
+
 class Element_Matrix_Arg(object):
     '''Embedded class, may not use it'''
 
@@ -233,6 +239,9 @@ def column_Ele_Trans(
 
 
 C_ET = column_Ele_Trans
+
+
+# << Gauss-Jordan Simplification >>
 
 
 def gauss(
