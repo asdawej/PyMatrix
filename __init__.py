@@ -1,5 +1,4 @@
-import matrix
-import linear_algebra
+from . import matrix, linear_algebra
 
 
 # << Error >>
@@ -47,3 +46,4 @@ jordan = linear_algebra.jordan
 rref = linear_algebra.rref
 isgauss = linear_algebra.isgauss
 isrref = linear_algebra.isrref
+solve = linear_algebra.solve
