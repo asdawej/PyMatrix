@@ -158,11 +158,11 @@ class Matrix(object):
 
             # Ellipsis:
             elif key[0] == Ellipsis:
-                # One column, return a coulumn
+                # One column, return a column
                 if isinstance(key[1], int):
                     temp: list[list] = []
                     for i in range(self.shape.m):
-                        temp.append(self.mat[i][key[1]-1])
+                        temp.append([self.mat[i][key[1]-1]])
                     return Matrix(temp)
 
                 # Slice columns, return a Matrix of columns
@@ -639,5 +639,5 @@ if __name__ == '__main__':
     va = Matrix([[1], [0], [5]])
     vb = Matrix([[3], [1], [2]])
     print('__call__ test:')
-    print(d(kw=True, p=va, q=vb)['p'], '\n', d(kw=True, p=va, q=vb)['q'])
-    print(d(va, vb))
+    print(d(kw=True, p=va, q=vb)['p'], '\n\n', d(kw=True, p=va, q=vb)['q'], '\n')
+    print(d(va, vb), '\n')

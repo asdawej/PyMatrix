@@ -1,4 +1,7 @@
-from matrix import *
+if __name__ == '__main__':
+    from matrix import *
+else:
+    from .matrix import *
 
 
 # << Common used Matrix >>
@@ -284,7 +287,7 @@ def gauss(
                 if max_row_save != i:
                     path.append(R_ET(mat, i, max_row_save, record=True))
         row_ptr, column_ptr = 1, 1
-        while column_ptr <= mat.shape.n:
+        while column_ptr <= mat.shape.n and row_ptr <= mat.shape.m:
             # Expected pivot is zero
             if mat[row_ptr, column_ptr] == 0:
                 flag = True
@@ -322,7 +325,7 @@ def gauss(
                 if max_row_save != i:
                     R_ET(mat, i, max_row_save)
         row_ptr, column_ptr = 1, 1
-        while column_ptr <= mat.shape.n:
+        while column_ptr <= mat.shape.n and row_ptr <= mat.shape.m:
             # Expected pivot is zero
             if mat[row_ptr, column_ptr] == 0:
                 flag = True
@@ -394,6 +397,8 @@ def jordan(
         save = 1
         # Find all the pivots
         for j in range(1, mat.shape.n+1):
+            if save > mat.shape.m:
+                break
             if mat[save, j] != 0:
                 column_pivots.append(j)
                 save += 1
@@ -428,6 +433,8 @@ def jordan(
         save = 1
         # Find all the pivots
         for j in range(1, mat.shape.n+1):
+            if save > mat.shape.m:
+                break
             if mat[save, j] != 0:
                 column_pivots.append(j)
                 save += 1
@@ -516,6 +523,47 @@ def isrref(mat: Matrix) -> bool:
     return True
 
 
+def solve(
+    A: Matrix, b: Matrix = None,
+    preoptimize: bool = True
+) -> Matrix | tuple[Matrix, Matrix]:
+    '''
+    - If only A, solve the Matrix of its null space\n
+    - If A and b, solve its null space and a column vector
+    ---
+    To return a null space,\n
+        we return a square Matrix that\
+    columns of pivots will be zero vectors,\n
+        and columns of free variables will be\
+    the base vectors of the null space
+    '''
+    if b:
+        result: Matrix = rref(Matrix([[A, b]]).unblock(), preoptimize=preoptimize)
+        vec: Matrix = result[..., result.shape.n]
+        result: Matrix = result[..., :result.shape.n]
+    else:
+        result: Matrix = rref(A[...], preoptimize=preoptimize)
+    temp = zeros(result.shape.n)
+    # Find pivots and free variables
+    for i in range(1, result.shape.m+1):
+        flag = True
+        save = 0
+        for j in range(1, result.shape.n+1):
+            if result[i, j] != 0:
+                # Pivot
+                if flag:
+                    save = j
+                    flag = False
+                # Free variable
+                else:
+                    temp[save, j] = -result[i, j]
+                    temp[j, j] = 1
+    if b:
+        return temp, vec
+    else:
+        return temp
+
+
 if __name__ == '__main__':
     print('zeros & ones & eye test:')
     print(zeros(3), '\n')
@@ -563,3 +611,12 @@ if __name__ == '__main__':
     print(b, '\n')
     for i, x in enumerate(path):
         print(i, x, '\n')
+
+    print('solve test:')
+    d, vec = solve(
+        Matrix([[1, 1, 0, 0], [1, 1, -1, 0], [0, 0, 1, 1]]),
+        Matrix([[1], [0], [1]])
+    )
+    print(d, '\n')
+    print(vec, '\n')
+    print(solve(Matrix([[1, 2, -1, 0, 0], [0, -1, 3, 0, 1]])), '\n')
