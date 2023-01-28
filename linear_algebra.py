@@ -563,6 +563,24 @@ def solve(
     else:
         return temp
 
+# << DecompositionError and LU & LDU & PLU Decompositions >>
+
+
+class DecompositionError(Exception):
+    pass
+
+
+def LU(mat: Matrix) -> tuple[Matrix, Matrix]:
+    pass
+
+
+def LDU(mat: Matrix) -> tuple[Matrix, Matrix, Matrix]:
+    pass
+
+
+def PLU(mat: Matrix) -> tuple[Matrix, Matrix, Matrix]:
+    pass
+
 
 if __name__ == '__main__':
     print('zeros & ones & eye test:')
