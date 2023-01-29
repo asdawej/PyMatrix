@@ -5,6 +5,7 @@ from . import matrix, linear_algebra
 
 
 ShapeError = matrix.ShapeError
+DecompositionError = linear_algebra.DecompositionError
 
 
 # << Class >>
@@ -47,3 +48,10 @@ rref = linear_algebra.rref
 isgauss = linear_algebra.isgauss
 isrref = linear_algebra.isrref
 solve = linear_algebra.solve
+
+
+# << LU & LDU & PLU Decompositions >>
+
+LU = linear_algebra.LU
+LDU = linear_algebra.LDU
+PLU = linear_algebra.PLU
