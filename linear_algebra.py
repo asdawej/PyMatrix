@@ -563,6 +563,7 @@ def solve(
     else:
         return temp
 
+
 # << DecompositionError and LU & LDU & PLU Decompositions >>
 
 
@@ -571,15 +572,88 @@ class DecompositionError(Exception):
 
 
 def LU(mat: Matrix) -> tuple[Matrix, Matrix]:
-    pass
+    '''
+    The LU Decomposition\n
+    Will raise DecompositionError\
+    if cannot be decomposed in this way\n
+    CHANGE your Matrix
+    '''
+    mat_U, path = gauss(mat, True, False)
+    mat_U: Matrix
+    if path == []:
+        return eye(mat_U.shape.m), mat_U
+    n = path[0].shape.n
+    mat_L: Matrix = eye(n)
+    # If all the path are mul-add Matrix,
+    # then it can be LU decomposed
+    for x in path:
+        if x.arg.i and x.arg.j and x.arg.k:
+            mat_L = mat_L@Element_Matrix(
+                n, x.arg.i, x.arg.j,
+                k=-x.arg.k
+            )
+        else:
+            raise DecompositionError(
+                'Cannot be LU decomposed'
+            )
+    return mat_L, mat_U
 
 
 def LDU(mat: Matrix) -> tuple[Matrix, Matrix, Matrix]:
-    pass
+    '''
+    The LDU Decomposition\n
+    Will raise DecompositionError\
+    if cannot be decomposed in this way\n
+    CHANGE your Matrix
+    '''
+    mat_L, mat_U = LU(mat)
+    mat_L: Matrix
+    mat_U: Matrix
+    mat_D: Matrix = eye(mat_L.shape.m)
+    # mat_U to mat_D@mat_U
+    for i in range(1, mat_U.shape.m+1):
+        save = mat_U[i, i]
+        if save == 0:
+            mat_U[i, i] = 1
+            mat_D[i, i] = 0
+        elif save != 1:
+            R_ET(mat_U, i, k=1/save)
+            mat_D[i, i] = save
+    return mat_L, mat_D, mat_U
 
 
 def PLU(mat: Matrix) -> tuple[Matrix, Matrix, Matrix]:
-    pass
+    '''
+    The PLU Decomposition\n
+    Will raise DecompositionError\
+    if cannot be decomposed in this way\n
+    CHANGE your Matrix
+    '''
+    mat_U, path = gauss(mat, True)
+    mat_U: Matrix
+    if path == []:
+        return eye(mat_U.shape.m), eye(mat_U.shape.m), mat_U
+    n = path[0].shape.n
+    mat_P: Matrix = eye(n)
+    mat_L: Matrix = eye(n)
+    # The former part are swap Matrix,
+    # and the latter part are mul-add Matrix
+    #
+    # If all the path are mul-add Matrix,
+    # then it can be LU decomposed
+    for x in path:
+        if x.arg.i and x.arg.j and x.arg.k:
+            mat_L = mat_L@Element_Matrix(
+                n, x.arg.i, x.arg.j,
+                k=-x.arg.k
+            )
+        elif x.arg.i and x.arg.j:
+            mat_P = mat_P@x
+        else:
+            raise DecompositionError(
+                'Cannot be PLU decomposed'
+            )
+    return mat_P, mat_L, mat_U
 
 
 if __name__ == '__main__':
@@ -638,3 +712,14 @@ if __name__ == '__main__':
     print(d, '\n')
     print(vec, '\n')
     print(solve(Matrix([[1, 2, -1, 0, 0], [0, -1, 3, 0, 1]])), '\n')
+
+    e = Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    print('LU test:')
+    for x in LU(e[...]):
+        print(x, '\n')
+    print('LDU test:')
+    for x in LDU(e[...]):
+        print(x, '\n')
+    print('PLU test')
+    for x in PLU(e):
+        print(x, '\n')
