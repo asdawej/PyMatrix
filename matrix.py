@@ -386,10 +386,10 @@ class Matrix(object):
         def f(a: int, b: int) -> Any:
             l = []
             for i in range(self.shape.n):
-                try:
-                    l.append(self[a, i+1]*other[i+1, b])
-                except:
+                if isinstance(self[a, i+1], Matrix) and isinstance(other[i+1, b], Matrix):
                     l.append(self[a, i+1]@other[i+1, b])
+                else:
+                    l.append(self[a, i+1]*other[i+1, b])
             return sum(l)
 
         temp: list[list] = []

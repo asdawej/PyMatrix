@@ -664,7 +664,7 @@ def PLU(mat: Matrix) -> tuple[Matrix, Matrix, Matrix]:
     return mat_P, mat_L, mat_U
 
 
-# << trace >>
+# << Trace >>
 
 
 def trace(mat: Matrix) -> Any:
@@ -678,6 +678,75 @@ def trace(mat: Matrix) -> Any:
     for i in range(1, mat.shape.m+1):
         s += mat[i, i]
     return s
+
+
+# << Inverse Matrix >>
+
+
+class NoInverseMatrixError(Exception):
+    pass
+
+
+def __inverse(self: Matrix) -> Matrix:
+    '''
+    The inverse Matrix
+    '''
+    self: Matrix = self
+    if self.shape.m != self.shape.n:
+        raise NotSquareMatrixError
+    n = self.shape.n
+    temp = Matrix([[self, eye(n)]]).unblock()
+    rref(temp, preoptimize=False)
+    temp = temp.enblock([n], [n, n])
+    if temp[1] != eye(n):
+        raise NoInverseMatrixError
+    else:
+        return temp[2]
+
+
+def __Rtruediv__(self: Matrix, other: Any) -> Matrix:
+    temp = __inverse(self)
+    if isinstance(other, Matrix):
+        return other@temp
+    else:
+        return other*temp
+
+
+Matrix.__rtruediv__ = __Rtruediv__
+
+
+def __Truediv__(self: Matrix, other: Any) -> Matrix:
+    if isinstance(other, Matrix):
+        return self@(1/other)
+    else:
+        return self*(1/other)
+
+
+Matrix.__truediv__ = __Truediv__
+
+
+# << Schur Complement >>
+
+
+def schur_complement():
+    pass
+
+
+schur_C = schur_complement
+
+
+def sherman_morrison_woodbury():
+    pass
+
+
+S_M_W = sherman_morrison_woodbury
+
+
+def sherman_morrison():
+    pass
+
+
+S_M = sherman_morrison
 
 
 if __name__ == '__main__':
@@ -750,3 +819,8 @@ if __name__ == '__main__':
 
     print('trace test:')
     print(trace(Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])))
+
+    print('__rtruediv__ & __truediv__ test:')
+    f = Matrix([[1, 2], [3, 4]])
+    print(1/f, '\n')
+    print(Matrix([[1, 2], [3, 4]])/f, '\n')

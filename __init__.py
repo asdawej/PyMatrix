@@ -7,6 +7,7 @@ from . import matrix, linear_algebra
 ShapeError = matrix.ShapeError
 NotSqaureMatrixError = matrix.NotSquareMatrixError
 DecompositionError = linear_algebra.DecompositionError
+NoInverseMatrixError = linear_algebra.NoInverseMatrixError
 
 
 # << Class >>
@@ -53,6 +54,24 @@ solve = linear_algebra.solve
 
 # << LU & LDU & PLU Decompositions >>
 
+
 LU = linear_algebra.LU
 LDU = linear_algebra.LDU
 PLU = linear_algebra.PLU
+
+
+# << Trace >>
+
+
+trace = linear_algebra.trace
+
+
+# << Schur Complement >>
+
+
+schur_complement = linear_algebra.schur_complement
+sherman_morrison_woodbury = linear_algebra.sherman_morrison_woodbury
+sherman_morrison = linear_algebra.sherman_morrison
+schur_C = linear_algebra.schur_C
+S_M_W = linear_algebra.S_M_W
+S_M = linear_algebra.S_M
