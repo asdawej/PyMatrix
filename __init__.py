@@ -66,6 +66,12 @@ PLU = linear_algebra.PLU
 trace = linear_algebra.trace
 
 
+# << Inverse Matrix >>
+
+
+isinverse=linear_algebra.isinverse
+
+
 # << Schur Complement >>
 
 

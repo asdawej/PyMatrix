@@ -725,25 +725,117 @@ def __Truediv__(self: Matrix, other: Any) -> Matrix:
 Matrix.__truediv__ = __Truediv__
 
 
+def isinverse(mat: Matrix) -> bool:
+    '''
+    To check whether is inversable
+    '''
+    try:
+        __inverse(mat)
+        return True
+    except:
+        return False
+
+
 # << Schur Complement >>
 
 
-def schur_complement():
-    pass
+def schur_complement(mat: Matrix, pos: str = '11') -> Matrix:
+    '''
+    Schur Complement\n
+    ---
+    - If pos == '11',\
+    return Schur Complement of A11
+    - If pos == '22',\
+    return Schur Complement of A22
+    '''
+    if pos == '11':
+        return mat[2, 2]-mat[2, 1]/mat[1, 1]@mat[1, 2]
+    elif pos == '22':
+        return mat[1, 1]-mat[1, 2]/mat[2, 2]@mat[2, 1]
+    else:
+        raise ValueError(
+            'pos should be 11 or 22, but not {}'.format(pos)
+        )
 
 
 schur_C = schur_complement
 
 
-def sherman_morrison_woodbury():
-    pass
+def sherman_morrison_woodbury(mat: Matrix, pos: str = '11') -> Matrix:
+    '''
+    Sherman-Morrison-Woodbury Formula\n
+    ---
+    - If pos == '11',\
+    only use Schur Complement of A11
+    - If pos == '22',\
+    only use Schur Complement of A22
+    '''
+    mat: Matrix = mat
+    if pos == '11':
+        A11r: Matrix = 1/mat[1, 1]
+        S11r: Matrix = 1/schur_C(mat)
+        return Matrix(
+            [[
+                A11r+A11r@mat[1, 2]@S11r@mat[2, 1]@A11r,
+                -A11r@mat[1, 2]@S11r
+            ],
+                [
+                -S11r@mat[2, 1]@A11r,
+                S11r
+            ]]
+        )
+    elif pos == '22':
+        A22r: Matrix = 1/mat[2, 2]
+        S22r: Matrix = 1/schur_C(mat, '22')
+        return Matrix(
+            [[
+                S22r,
+                -S22r@mat[1, 2]@A22r
+            ],
+                [
+                -A22r@mat[2, 1]@S22r,
+                A22r+A22r@mat[2, 1]@S22r@mat[1, 2]@A22r
+            ]]
+        )
+    else:
+        raise ValueError(
+            'pos should be 11 or 22, but not {}'.format(pos)
+        )
 
 
 S_M_W = sherman_morrison_woodbury
 
 
-def sherman_morrison():
-    pass
+def sherman_morrison(mat: Matrix) -> Matrix:
+    '''
+    Sherman-Morrison Formula\n
+    ---
+    For blocked Matrix:
+        [[A, u],\n
+        [-v', 1]]
+    then we return Inv(A+uv') =
+        Inv(A) - ( Inv(A) u v' Inv(A) ) / ( 1 + v' Inv(A) u )
+    p.s.: Inv(A) is the inverse Matrix of A
+    '''
+    mat: Matrix = mat
+    A = mat[1, 1]
+    u = mat[1, 2]
+    v = -mat[2, 1]
+    if (
+        isinstance(A, Matrix)
+        and isinstance(u, Matrix)
+        and isinstance(v, Matrix)
+    ):
+        if not (
+            u.shape.n == 1
+            and v.shape.m == 1
+        ):
+            raise ShapeError('Not correct blocked Matrix')
+        else:
+            Ar: Matrix = 1/A
+            return Ar-(Ar@u@v@Ar)/(1+(v@Ar@u)[1])
+    else:
+        raise TypeError('Not blocked Matrix for S-M Formula')
 
 
 S_M = sherman_morrison
@@ -824,3 +916,4 @@ if __name__ == '__main__':
     f = Matrix([[1, 2], [3, 4]])
     print(1/f, '\n')
     print(Matrix([[1, 2], [3, 4]])/f, '\n')
+    print(isinverse(f), isinverse(Matrix([[1, 1], [2, 2]])), '\n')
