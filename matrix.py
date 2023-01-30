@@ -404,7 +404,7 @@ class Matrix(object):
         Integer power of square Matrix
         '''
         if self.shape.m != self.shape.n:
-            raise NotSquareMatrixError('Not a square Matrix')
+            raise NotSquareMatrixError
         temp = self
         for _ in range(other-1):
             temp = temp@self

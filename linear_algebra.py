@@ -37,6 +37,7 @@ def iszeros(mat: Matrix) -> bool:
     '''
     To check whether it is a zeros Matrix
     '''
+    mat: Matrix = mat  # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if mat[i, j] != 0:
@@ -67,6 +68,7 @@ def isones(mat: Matrix) -> bool:
     '''
     To check whether it is a ones Matrix
     '''
+    mat: Matrix = mat  # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if mat[i, j] != 1:
@@ -97,6 +99,7 @@ def isnones(mat: Matrix) -> bool:
     '''
     To check whether it is a nones Matrix
     '''
+    mat: Matrix = mat  # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if mat[i, j] != None:
@@ -116,9 +119,9 @@ def eye(*args: int) -> Matrix:
     [0, 1]]
     '''
     if len(args) == 1:
-        temp = zeros(args[0])
+        temp: Matrix = zeros(args[0])
     else:
-        temp = zeros(args[0], args[1])
+        temp: Matrix = zeros(args[0], args[1])
     for i in range(1, min(temp.shape.m, temp.shape.n)+1):
         temp[i, i] = 1
     return temp
@@ -128,6 +131,7 @@ def iseye(mat: Matrix) -> bool:
     '''
     To check whether it is a eye Matrix
     '''
+    mat: Matrix = mat  # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if i == j:
@@ -170,7 +174,7 @@ class Element_Matrix(Matrix):
         ---
         Members are /mat/, /shape.m/, /shape.n/, /arg.i/, /arg.j/, /arg.k/
         '''
-        temp_pre = eye(n)
+        temp_pre: Matrix = eye(n)
         if j:
             if k:
                 temp_pre[j, i] = k
@@ -579,7 +583,7 @@ def LU(mat: Matrix) -> tuple[Matrix, Matrix]:
     CHANGE your Matrix
     '''
     if mat.shape.m != mat.shape.n:
-        raise NotSquareMatrixError('Not a square Matrix')
+        raise NotSquareMatrixError
     mat_U, path = gauss(mat, True, False)
     mat_U: Matrix
     if path == []:
@@ -632,7 +636,7 @@ def PLU(mat: Matrix) -> tuple[Matrix, Matrix, Matrix]:
     CHANGE your Matrix
     '''
     if mat.shape.m != mat.shape.n:
-        raise NotSquareMatrixError('Not a square Matrix')
+        raise NotSquareMatrixError
     mat_U, path = gauss(mat, True)
     mat_U: Matrix
     if path == []:
@@ -658,6 +662,22 @@ def PLU(mat: Matrix) -> tuple[Matrix, Matrix, Matrix]:
                 'Cannot be PLU decomposed'
             )
     return mat_P, mat_L, mat_U
+
+
+# << trace >>
+
+
+def trace(mat: Matrix) -> Any:
+    '''
+    The trace of Matrix
+    '''
+    mat: Matrix = mat
+    if mat.shape.m != mat.shape.n:
+        raise NotSquareMatrixError
+    s = 0
+    for i in range(1, mat.shape.m+1):
+        s += mat[i, i]
+    return s
 
 
 if __name__ == '__main__':
@@ -727,3 +747,6 @@ if __name__ == '__main__':
     print('PLU test')
     for x in PLU(e):
         print(x, '\n')
+
+    print('trace test:')
+    print(trace(Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])))
