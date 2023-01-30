@@ -578,6 +578,8 @@ def LU(mat: Matrix) -> tuple[Matrix, Matrix]:
     if cannot be decomposed in this way\n
     CHANGE your Matrix
     '''
+    if mat.shape.m != mat.shape.n:
+        raise NotSquareMatrixError('Not a square Matrix')
     mat_U, path = gauss(mat, True, False)
     mat_U: Matrix
     if path == []:
@@ -629,6 +631,8 @@ def PLU(mat: Matrix) -> tuple[Matrix, Matrix, Matrix]:
     if cannot be decomposed in this way\n
     CHANGE your Matrix
     '''
+    if mat.shape.m != mat.shape.n:
+        raise NotSquareMatrixError('Not a square Matrix')
     mat_U, path = gauss(mat, True)
     mat_U: Matrix
     if path == []:

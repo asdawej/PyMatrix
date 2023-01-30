@@ -19,6 +19,10 @@ class ShapeError(ValueError):
     pass
 
 
+class NotSquareMatrixError(ShapeError):
+    pass
+
+
 class Matrix(object):
     '''
     Members are /mat/, /shape.m/, /shape.n/\n
@@ -400,7 +404,7 @@ class Matrix(object):
         Integer power of square Matrix
         '''
         if self.shape.m != self.shape.n:
-            raise ShapeError('Not a square Matrix')
+            raise NotSquareMatrixError('Not a square Matrix')
         temp = self
         for _ in range(other-1):
             temp = temp@self

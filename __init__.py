@@ -5,6 +5,7 @@ from . import matrix, linear_algebra
 
 
 ShapeError = matrix.ShapeError
+NotSqaureMatrixError = matrix.NotSquareMatrixError
 DecompositionError = linear_algebra.DecompositionError
 
 
