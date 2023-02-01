@@ -1,5 +1,7 @@
-from typing import Any, NoReturn, Iterator, Dict
-from types import EllipsisType
+try:
+    from .__import import *
+except:
+    from __import import *
 
 __author__ = 'asdawej'
 

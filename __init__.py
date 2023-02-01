@@ -68,5 +68,6 @@ S_M = linear_algebra.S_M
 
 # << Determinant >>
 
+inversion_num = linear_algebra.inversion_num
 det_def = linear_algebra.det_def
 det_expand = linear_algebra.det_expand

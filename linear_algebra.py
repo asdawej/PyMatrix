@@ -884,6 +884,19 @@ S_M = sherman_morrison
 # << Determinant >>
 
 
+def inversion_num(permut: tuple[int] | list[int]) -> int:
+    '''
+    Count the inversion number of permutation
+    '''
+    length = len(permut)
+    save = 0
+    for i in range(length):
+        for j in range(i+1, length):
+            if permut[i] > permut[j]:
+                save += 1
+    return save % 2
+
+
 def det_def(mat: Matrix) -> Any:
     '''
     The determinant of a square Matrix\n
@@ -893,9 +906,53 @@ def det_def(mat: Matrix) -> Any:
     please use func /det_expand/
     '''
     mat: Matrix = mat   # For type hint
+    mat = mat.unblock()
     if mat.shape.m != mat.shape.n:
         raise NotSquareMatrixError
-    pass
+    # Diagonal Matrix
+    if isdiag(mat):
+        if len(mat) == 1:
+            return mat[1]
+        else:
+            return reduce(
+                lambda x, y: x*y,
+                [
+                    mat[i, i]
+                    for i in range(1, mat.shape.m+1)
+                ]
+            )
+    # 3 order square Matrix
+    elif mat.shape.m == 3:
+        return (
+            mat[1, 1]*mat[2, 2]*mat[3, 3] +
+            mat[1, 2]*mat[2, 3]*mat[3, 1] +
+            mat[1, 3]*mat[2, 1]*mat[3, 2] -
+            mat[1, 3]*mat[2, 2]*mat[3, 1] -
+            mat[1, 2]*mat[2, 1]*mat[3, 3] -
+            mat[1, 1]*mat[2, 3]*mat[3, 2]
+        )
+    # 2 order square Matrix
+    elif mat.shape.m == 2:
+        return (
+            mat[1, 1]*mat[2, 2] -
+            mat[1, 2]*mat[2, 1]
+        )
+    # General square Matrix
+    else:
+        return reduce(
+            lambda x, y: x+y,
+            [
+                reduce(
+                    lambda x, y: x*y,
+                    [
+                        mat[i, permut[i-1]]
+                        for i in range(1, mat.shape.n+1)
+                    ]
+                )*(-1)**inversion_num(permut)
+
+                for permut in permutations(range(1, mat.shape.n+1))
+            ]
+        )
 
 
 def det_expand(mat: Matrix, depth: int = 3) -> Any:
@@ -990,3 +1047,11 @@ if __name__ == '__main__':
     print(1/f, '\n')
     print(Matrix([[1, 2], [3, 4]])/f, '\n')
     print(isinverse(f), isinverse(Matrix([[1, 1], [2, 2]])), '\n')
+
+    print('det_def & det_expand test:')
+    print(
+        det_def(Matrix([[1, 2, 3, 4], [5, 5, 7, 8], [9, 10, 10, 12], [13, 14, 15, 15]])),
+        det_def(Matrix([[1, 0, 0, 0], [0, 2, 0, 0], [0, 0, 3, 0], [0, 0, 0, 4]])),
+        det_def(Matrix([[1, 2], [3, 4]])),
+        det_def(Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])), '\n'
+    )
