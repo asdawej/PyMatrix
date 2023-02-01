@@ -966,7 +966,19 @@ def det_expand(mat: Matrix, depth: int = 3) -> Any:
     mat: Matrix = mat   # For type hint
     if mat.shape.m != mat.shape.n:
         raise NotSquareMatrixError
-    pass
+    if mat.shape.m <= depth:
+        return det_def(mat)
+    else:
+        return reduce(
+            lambda x, y: x+y,
+            [
+                det_expand(
+                    Matrix([[mat[2:, :i], mat[2:, i+1:]]]).unblock()
+                )*mat[1, i]*(-1)**(i+1)
+
+                for i in range(1, mat.shape.n+1)
+            ]
+        )
 
 
 if __name__ == '__main__':
@@ -976,7 +988,10 @@ if __name__ == '__main__':
     print(eye(3), '\n')
     print(iszeros(zeros(4, 5)), iseye(eye(7, 2)), '\n')
     print(diag(Matrix([[1, 2, 3]])), '\n')
-    print(isdiag(diag(Matrix([[1], [2], [3]]))), isdiag(Matrix([[1, 2], [0, 3]])), '\n')
+    print(
+        isdiag(diag(Matrix([[1], [2], [3]]))),
+        isdiag(Matrix([[1, 2], [0, 3]])), '\n'
+    )
 
     print('Element_Matrix test:')
     print(Element_Matrix(4, 1, 4), '\n')
@@ -1050,8 +1065,33 @@ if __name__ == '__main__':
 
     print('det_def & det_expand test:')
     print(
-        det_def(Matrix([[1, 2, 3, 4], [5, 5, 7, 8], [9, 10, 10, 12], [13, 14, 15, 15]])),
-        det_def(Matrix([[1, 0, 0, 0], [0, 2, 0, 0], [0, 0, 3, 0], [0, 0, 0, 4]])),
+        det_def(Matrix(
+            [[1, 2, 3, 4],
+             [5, 5, 7, 8],
+             [9, 10, 10, 12],
+             [13, 14, 15, 15]]
+        )),
+        det_def(Matrix(
+            [[1, 0, 0, 0],
+             [0, 2, 0, 0],
+             [0, 0, 3, 0],
+             [0, 0, 0, 4]]
+        )),
         det_def(Matrix([[1, 2], [3, 4]])),
         det_def(Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])), '\n'
+    )
+    print(
+        det_expand(Matrix(
+            [[1, 2, 3, 4],
+             [5, 5, 7, 8],
+             [9, 10, 10, 12],
+             [13, 14, 15, 15]]
+        )),
+        det_expand(Matrix(
+            [[1, 2, 3, 4, 5],
+             [5, 4, 3, 2, 1],
+             [6, 8, 0, 7, 9],
+             [0, 9, 8, 7, 6],
+             [-3, -5, -4, -1, -2]]
+        ), 1), '\n'
     )
