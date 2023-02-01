@@ -429,7 +429,7 @@ class Matrix(object):
 
     def __len__(self) -> int:
         '''
-        To get the shape
+        To get the number of elements
         '''
         return self.shape.m*self.shape.n
 

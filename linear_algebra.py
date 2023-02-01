@@ -1,7 +1,7 @@
-if __name__ == '__main__':
-    from matrix import *
-else:
+try:
     from .matrix import *
+except:
+    from matrix import *
 
 
 # << Common used Matrix >>
@@ -37,7 +37,7 @@ def iszeros(mat: Matrix) -> bool:
     '''
     To check whether it is a zeros Matrix
     '''
-    mat: Matrix = mat  # For type hint
+    mat: Matrix = mat   # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if mat[i, j] != 0:
@@ -68,7 +68,7 @@ def isones(mat: Matrix) -> bool:
     '''
     To check whether it is a ones Matrix
     '''
-    mat: Matrix = mat  # For type hint
+    mat: Matrix = mat   # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if mat[i, j] != 1:
@@ -99,7 +99,7 @@ def isnones(mat: Matrix) -> bool:
     '''
     To check whether it is a nones Matrix
     '''
-    mat: Matrix = mat  # For type hint
+    mat: Matrix = mat   # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if mat[i, j] != None:
@@ -109,7 +109,7 @@ def isnones(mat: Matrix) -> bool:
 
 def eye(*args: int) -> Matrix:
     '''
-    Create a Matrix with only the diagnal being 1\n
+    Create a Matrix with only the diagonal being 1\n
     ---
     eye(2, 3) ->\n
     [[1, 0, 0],\n
@@ -131,13 +131,45 @@ def iseye(mat: Matrix) -> bool:
     '''
     To check whether it is a eye Matrix
     '''
-    mat: Matrix = mat  # For type hint
+    mat: Matrix = mat   # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if i == j:
                 if mat[i, j] != 1:
                     return False
             else:
+                if mat[i, j] != 0:
+                    return False
+    return True
+
+
+def diag(vec: Matrix) -> Matrix:
+    '''
+    Create a diagonal Matrix
+    '''
+    vec: Matrix = vec   # For type hint
+    if vec.shape.m != 1 and vec.shape.n != 1:
+        raise ShapeError(
+            'Not a vector, but a {}x{} Matrix'.format(
+                vec.shape.m, vec.shape.n
+            )
+        )
+    temp: Matrix = eye(len(vec))
+    for i in range(1, temp.shape.m+1):
+        temp[i, i] = vec[i]
+    return temp
+
+
+def isdiag(mat: Matrix) -> bool:
+    '''
+    To check whether it is a diagonal Matrix
+    '''
+    mat: Matrix = mat   # For type hint
+    if mat.shape.m != mat.shape.n:
+        return False
+    for i in range(1, mat.shape.m+1):
+        for j in range(1, mat.shape.n+1):
+            if i != j:
                 if mat[i, j] != 0:
                     return False
     return True
@@ -201,6 +233,7 @@ def row_Ele_Trans(
     Row Elementary Transformation\n
     For i, j, k, please search Elementary_Matrix() for more information
     '''
+    mat: Matrix = mat   # For type hint
     if j:
         if k:
             for t in range(1, mat.shape.n+1):
@@ -229,6 +262,7 @@ def column_Ele_Trans(
     Column Elementary Transformation\n
     For i, j, k, please search Elementary_Matrix() for more information
     '''
+    mat: Matrix = mat   # For type hint
     if j:
         if k:
             for t in range(1, mat.shape.m+1):
@@ -279,6 +313,7 @@ def gauss(
         E(1, 1)\n
         E(1, 2; -1/2)
     '''
+    mat: Matrix = mat   # For type hint
     if record:
         path: list[Element_Matrix] = []
         if preoptimize:
@@ -359,6 +394,7 @@ def isgauss(mat: Matrix) -> bool:
     '''
     To check whether the Matrix is Gauss-Simplified
     '''
+    mat: Matrix = mat   # For type hint
     row_pivots: list[int] = []
     for j in range(1, mat.shape.n+1):
         save = 0
@@ -393,6 +429,7 @@ def jordan(
         E(2, 1; 3/2)\n
         E(2; -1/2)
     '''
+    mat: Matrix = mat   # For type hint
     if not isgauss(mat):
         raise ValueError('Not row echelon form')
     if record:
@@ -506,6 +543,7 @@ def isrref(mat: Matrix) -> bool:
     '''
     To check whether the Matrix is rrefed
     '''
+    mat: Matrix = mat   # For type hint
     row_pivots: list[int] = []
     for j in range(1, mat.shape.n+1):
         save = 0
@@ -582,6 +620,7 @@ def LU(mat: Matrix) -> tuple[Matrix, Matrix]:
     if cannot be decomposed in this way\n
     CHANGE your Matrix
     '''
+    mat: Matrix = mat   # For type hint
     if mat.shape.m != mat.shape.n:
         raise NotSquareMatrixError
     mat_U, path = gauss(mat, True, False)
@@ -635,6 +674,7 @@ def PLU(mat: Matrix) -> tuple[Matrix, Matrix, Matrix]:
     if cannot be decomposed in this way\n
     CHANGE your Matrix
     '''
+    mat: Matrix = mat   # For type hint
     if mat.shape.m != mat.shape.n:
         raise NotSquareMatrixError
     mat_U, path = gauss(mat, True)
@@ -671,7 +711,7 @@ def trace(mat: Matrix) -> Any:
     '''
     The trace of Matrix
     '''
-    mat: Matrix = mat
+    mat: Matrix = mat   # For type hint
     if mat.shape.m != mat.shape.n:
         raise NotSquareMatrixError
     s = 0
@@ -691,7 +731,7 @@ def __inverse(self: Matrix) -> Matrix:
     '''
     The inverse Matrix
     '''
-    self: Matrix = self
+    self: Matrix = self  # For type hint
     if self.shape.m != self.shape.n:
         raise NotSquareMatrixError
     n = self.shape.n
@@ -770,7 +810,7 @@ def sherman_morrison_woodbury(mat: Matrix, pos: str = '11') -> Matrix:
     - If pos == '22',\
     only use Schur Complement of A22
     '''
-    mat: Matrix = mat
+    mat: Matrix = mat   # For type hint
     if pos == '11':
         A11r: Matrix = 1/mat[1, 1]
         S11r: Matrix = 1/schur_C(mat)
@@ -817,7 +857,7 @@ def sherman_morrison(mat: Matrix) -> Matrix:
         Inv(A) - ( Inv(A) u v' Inv(A) ) / ( 1 + v' Inv(A) u )
     p.s.: Inv(A) is the inverse Matrix of A
     '''
-    mat: Matrix = mat
+    mat: Matrix = mat   # For type hint
     A = mat[1, 1]
     u = mat[1, 2]
     v = -mat[2, 1]
@@ -841,12 +881,45 @@ def sherman_morrison(mat: Matrix) -> Matrix:
 S_M = sherman_morrison
 
 
+# << Determinant >>
+
+
+def det_def(mat: Matrix) -> Any:
+    '''
+    The determinant of a square Matrix\n
+    ---
+    This func uses the definition of determinant\n
+    If you want to conut it by expanding it,\
+    please use func /det_expand/
+    '''
+    mat: Matrix = mat   # For type hint
+    if mat.shape.m != mat.shape.n:
+        raise NotSquareMatrixError
+    pass
+
+
+def det_expand(mat: Matrix, depth: int = 3) -> Any:
+    '''
+    The determinant of a square Matrix\n
+    ---
+    This func first expand it \n
+    If you want to conut it by definition,\
+    please use func /det_def/
+    '''
+    mat: Matrix = mat   # For type hint
+    if mat.shape.m != mat.shape.n:
+        raise NotSquareMatrixError
+    pass
+
+
 if __name__ == '__main__':
-    print('zeros & ones & eye test:')
+    print('zeros & ones & eye & diag test:')
     print(zeros(3), '\n')
     print(ones(2, 3), '\n')
     print(eye(3), '\n')
     print(iszeros(zeros(4, 5)), iseye(eye(7, 2)), '\n')
+    print(diag(Matrix([[1, 2, 3]])), '\n')
+    print(isdiag(diag(Matrix([[1], [2], [3]]))), isdiag(Matrix([[1, 2], [0, 3]])), '\n')
 
     print('Element_Matrix test:')
     print(Element_Matrix(4, 1, 4), '\n')
