@@ -20,17 +20,16 @@ def zeros(*args: int) -> Matrix:
     '''
     temp: list[list] = []
     if len(args) == 1:
-        for i in range(args[0]):
+        for i in range(*args):
             temp.append([])
-            for _ in range(args[0]):
+            for _ in range(*args):
                 temp[-1].append(0)
-        return Matrix(temp)
     else:
         for i in range(args[0]):
             temp.append([])
             for _ in range(args[1]):
                 temp[-1].append(0)
-        return Matrix(temp)
+    return Matrix(temp)
 
 
 def iszeros(mat: Matrix) -> bool:
@@ -40,7 +39,7 @@ def iszeros(mat: Matrix) -> bool:
     mat: Matrix = mat   # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
-            if mat[i, j] != 0:
+            if abs(mat[i, j]) >= 10**LOG_EPSILON:
                 return False
     return True
 
@@ -57,7 +56,7 @@ def ones(*args: int) -> Matrix:
     [1, 1]]
     '''
     if len(args) == 1:
-        temp = zeros(args[0])
+        temp = zeros(*args)
     else:
         temp = zeros(args[0], args[1])
     temp[...] = 1
@@ -71,7 +70,7 @@ def isones(mat: Matrix) -> bool:
     mat: Matrix = mat   # For type hint
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
-            if mat[i, j] != 1:
+            if abs(mat[i, j]-1) >= 10**LOG_EPSILON:
                 return False
     return True
 
@@ -88,7 +87,7 @@ def nones(*args: int) -> Matrix:
     [None, None]]
     '''
     if len(args) == 1:
-        temp = zeros(args[0])
+        temp = zeros(*args)
     else:
         temp = zeros(args[0], args[1])
     temp[...] = None
@@ -119,7 +118,7 @@ def eye(*args: int) -> Matrix:
     [0, 1]]
     '''
     if len(args) == 1:
-        temp: Matrix = zeros(args[0])
+        temp: Matrix = zeros(*args)
     else:
         temp: Matrix = zeros(args[0], args[1])
     for i in range(1, min(temp.shape.m, temp.shape.n)+1):
@@ -135,10 +134,10 @@ def iseye(mat: Matrix) -> bool:
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if i == j:
-                if mat[i, j] != 1:
+                if abs(mat[i, j]-1) >= 10**LOG_EPSILON:
                     return False
             else:
-                if mat[i, j] != 0:
+                if abs(mat[i, j]) >= 10**LOG_EPSILON:
                     return False
     return True
 
@@ -170,9 +169,30 @@ def isdiag(mat: Matrix) -> bool:
     for i in range(1, mat.shape.m+1):
         for j in range(1, mat.shape.n+1):
             if i != j:
-                if mat[i, j] != 0:
+                if abs(mat[i, j]) >= 10**LOG_EPSILON:
                     return False
     return True
+
+
+def custom(method: Callable, func_args: tuple, *args: int) -> Matrix:
+    '''
+    Use method to create a Matrix\n
+    ---
+    Example:\n
+    custom(random.random, (), 2, 3)
+    '''
+    temp: list[list] = []
+    if len(args) == 1:
+        for i in range(*args):
+            temp.append([])
+            for _ in range(*args):
+                temp[-1].append(method(*func_args))
+    else:
+        for i in range(args[0]):
+            temp.append([])
+            for _ in range(args[1]):
+                temp[-1].append(method(*func_args))
+    return Matrix(temp)
 
 
 # << Elementary Matrix and transformation >>
@@ -328,11 +348,11 @@ def gauss(
         row_ptr, column_ptr = 1, 1
         while column_ptr <= mat.shape.n and row_ptr <= mat.shape.m:
             # Expected pivot is zero
-            if mat[row_ptr, column_ptr] == 0:
+            if abs(mat[row_ptr, column_ptr]) < 10**LOG_EPSILON:
                 flag = True
                 for t in range(row_ptr+1, mat.shape.m+1):
                     # Find a non-zero element, swap the two rows
-                    if mat[t, column_ptr] != 0:
+                    if abs(mat[t, column_ptr]) >= 10**LOG_EPSILON:
                         flag = False
                         path.append(R_ET(mat, row_ptr, t, record=True))
                         break
@@ -342,7 +362,7 @@ def gauss(
                     continue
             # Mul-add elimination
             for t in range(row_ptr+1, mat.shape.m+1):
-                if mat[t, column_ptr] != 0:
+                if abs(mat[t, column_ptr]) >= 10**LOG_EPSILON:
                     path.append(
                         R_ET(
                             mat, row_ptr, t,
@@ -366,11 +386,11 @@ def gauss(
         row_ptr, column_ptr = 1, 1
         while column_ptr <= mat.shape.n and row_ptr <= mat.shape.m:
             # Expected pivot is zero
-            if mat[row_ptr, column_ptr] == 0:
+            if abs(mat[row_ptr, column_ptr]) < 10**LOG_EPSILON:
                 flag = True
                 for t in range(row_ptr+1, mat.shape.m+1):
                     # Find a non-zero element, swap the two rows
-                    if mat[t, column_ptr] != 0:
+                    if abs(mat[t, column_ptr]) >= 10**LOG_EPSILON:
                         flag = False
                         R_ET(mat, row_ptr, t)
                         break
@@ -380,7 +400,7 @@ def gauss(
                     continue
             # Mul-add elimination
             for t in range(row_ptr+1, mat.shape.m+1):
-                if mat[t, column_ptr] != 0:
+                if abs(mat[t, column_ptr]) >= 10**LOG_EPSILON:
                     R_ET(
                         mat, row_ptr, t,
                         k=-mat[t, column_ptr]/mat[row_ptr, column_ptr]
@@ -399,7 +419,7 @@ def isgauss(mat: Matrix) -> bool:
     for j in range(1, mat.shape.n+1):
         save = 0
         for i in range(1, mat.shape.m+1):
-            if mat[i, j] != 0:
+            if abs(mat[i, j]) >= 10**LOG_EPSILON:
                 save = i
         if not save in row_pivots and save != 0:
             row_pivots.append(save)
@@ -440,14 +460,14 @@ def jordan(
         for j in range(1, mat.shape.n+1):
             if save > mat.shape.m:
                 break
-            if mat[save, j] != 0:
+            if abs(mat[save, j]) >= 10**LOG_EPSILON:
                 column_pivots.append(j)
                 save += 1
         save -= 1
         # Mul-add elimination
         for x in reversed(column_pivots):
             for i in range(save-1, 0, -1):
-                if mat[i, x] != 0:
+                if abs(mat[i, x]) >= 10**LOG_EPSILON:
                     path.append(
                         R_ET(
                             mat, save, i,
@@ -459,7 +479,7 @@ def jordan(
         save += 1
         # Convert pivots into ones
         for x in column_pivots:
-            if mat[save, x] != 1:
+            if abs(mat[save, x]-1) >= 10**LOG_EPSILON:
                 path.append(
                     R_ET(
                         mat, save,
@@ -476,14 +496,14 @@ def jordan(
         for j in range(1, mat.shape.n+1):
             if save > mat.shape.m:
                 break
-            if mat[save, j] != 0:
+            if abs(mat[save, j]) >= 10**LOG_EPSILON:
                 column_pivots.append(j)
                 save += 1
         save -= 1
         # Mul-add elimination
         for x in reversed(column_pivots):
             for i in range(save-1, 0, -1):
-                if mat[i, x] != 0:
+                if abs(mat[i, x]) >= 10**LOG_EPSILON:
                     R_ET(
                         mat, save, i,
                         k=-mat[i, x]/mat[save, x]
@@ -492,7 +512,7 @@ def jordan(
         save += 1
         # Convert pivots into ones
         for x in column_pivots:
-            if mat[save, x] != 1:
+            if abs(mat[save, x]-1) >= 10**LOG_EPSILON:
                 R_ET(
                     mat, save,
                     k=1/mat[save, x]
@@ -549,7 +569,7 @@ def isrref(mat: Matrix) -> bool:
         save = 0
         zero_count = 0
         for i in range(1, mat.shape.m+1):
-            if mat[i, j] != 0:
+            if abs(mat[i, j]) >= 10**(LOG_EPSILON):
                 save = i
             else:
                 zero_count += 1
@@ -902,8 +922,10 @@ def det_def(mat: Matrix) -> Any:
     The determinant of a square Matrix\n
     ---
     This func uses the definition of determinant\n
-    If you want to conut it by expanding it,\
-    please use func /det_expand/
+    If you want to count it by expanding it,\
+    please use func /det_expand/\n
+    If you want to count it by Gauss Simplification,\
+    please use func /det_gauss/
     '''
     mat: Matrix = mat   # For type hint
     mat = mat.unblock()
@@ -960,8 +982,10 @@ def det_expand(mat: Matrix, depth: int = 3) -> Any:
     The determinant of a square Matrix\n
     ---
     This func first expand it \n
-    If you want to conut it by definition,\
-    please use func /det_def/
+    If you want to count it by definition,\
+    please use func /det_def/\n
+    If you want to count it by Gauss Simplification,\
+    please use func /det_gauss/
     '''
     mat: Matrix = mat   # For type hint
     if mat.shape.m != mat.shape.n:
@@ -981,6 +1005,43 @@ def det_expand(mat: Matrix, depth: int = 3) -> Any:
         )
 
 
+def det_gauss(mat: Matrix, preoptimize: bool = True) -> Any:
+    '''
+    The determinant of a square Matrix\n
+    ---
+    This func uses Gauss Simplification\n
+    If you want to count it by expanding it,\
+    please use func /det_expand/\n
+    If you want to count it by definition,\
+    please use func /det_def/
+    '''
+    mat: Matrix = mat   # For type hint
+    mat = mat.unblock()
+    if mat.shape.m != mat.shape.n:
+        raise NotSquareMatrixError
+    # Diagonal Matrix
+    if isdiag(mat):
+        if len(mat) == 1:
+            return mat[1]
+        else:
+            return reduce(
+                lambda x, y: x*y,
+                [
+                    mat[i, i]
+                    for i in range(1, mat.shape.m+1)
+                ]
+            )
+    else:
+        mat: Matrix = gauss(mat[...], preoptimize=preoptimize)
+        return reduce(
+            lambda x, y: x*y,
+            [
+                mat[i, i]
+                for i in range(1, mat.shape.m+1)
+            ]
+        )
+
+
 if __name__ == '__main__':
     print('zeros & ones & eye & diag test:')
     print(zeros(3), '\n')
@@ -992,6 +1053,7 @@ if __name__ == '__main__':
         isdiag(diag(Matrix([[1], [2], [3]]))),
         isdiag(Matrix([[1, 2], [0, 3]])), '\n'
     )
+    print(custom(lambda: 1, (), 2, 3), '\n')
 
     print('Element_Matrix test:')
     print(Element_Matrix(4, 1, 4), '\n')
@@ -1094,4 +1156,19 @@ if __name__ == '__main__':
              [0, 9, 8, 7, 6],
              [-3, -5, -4, -1, -2]]
         ), 1), '\n'
+    )
+    print(
+        det_gauss(Matrix(
+            [[1, 2, 3, 4],
+             [5, 5, 7, 8],
+             [9, 10, 10, 12],
+             [13, 14, 15, 15]]
+        )),
+        det_gauss(Matrix(
+            [[1, 2, 3, 4, 5],
+             [5, 4, 3, 2, 1],
+             [6, 8, 0, 7, 9],
+             [0, 9, 8, 7, 6],
+             [-3, -5, -4, -1, -2]]
+        ), False), '\n'
     )

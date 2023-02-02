@@ -3,7 +3,7 @@ try:
 except:
     from __import import *
 
-__author__ = 'asdawej'
+__author__: Final = 'asdawej'
 
 
 class Shape(object):

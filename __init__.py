@@ -1,5 +1,7 @@
 from . import matrix, linear_algebra
 
+LOG_EPSILON = matrix.LOG_EPSILON
+
 # << Error >>
 
 ShapeError = matrix.ShapeError
@@ -21,6 +23,7 @@ ones = linear_algebra.ones
 nones = linear_algebra.nones
 eye = linear_algebra.eye
 diag = linear_algebra.diag
+custom = linear_algebra.custom
 iszeros = linear_algebra.iszeros
 isones = linear_algebra.isones
 isnones = linear_algebra.isnones
@@ -71,3 +74,4 @@ S_M = linear_algebra.S_M
 inversion_num = linear_algebra.inversion_num
 det_def = linear_algebra.det_def
 det_expand = linear_algebra.det_expand
+det_gauss = linear_algebra.det_gauss
